@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ListWithIndex</string>
+    <string name="login">XXXXXXX</string>
+    <string name="passwd">XXXXXXXX</string>
+    <string-array name="fruits_array">
+        <item>Apples</item>
+        <item>Apricots</item>
+        <item>Avocado</item>
+        <item>Annona</item>
+    </string-array>
+</resources>
