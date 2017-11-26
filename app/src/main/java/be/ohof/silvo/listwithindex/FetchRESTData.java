@@ -27,7 +27,7 @@ import javax.net.ssl.X509TrustManager;
  * Created by silvo on 10/10/17.
  */
 
-public class FetchRESTData extends AsyncTask<CustomersBox,Void,Void> {
+public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
 
     String login;
     String passwd;
@@ -41,16 +41,15 @@ public class FetchRESTData extends AsyncTask<CustomersBox,Void,Void> {
     }
 
     @Override
-    protected Void doInBackground(CustomersBox... params) {
-        Log.e("FetchRESTData => ", "start");
+    protected Void doInBackground(CustomersBoxHash... params) {
         trustEveryone();
 
-
         try {
-            Log.e("FetchRESTData", "connecting to pbs");
+            Log.e("FetchRESTData", "connecting to pbs ...");
+
+            // ====== Getting customers list
+
             URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_customer_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D");
-
-
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
@@ -60,8 +59,6 @@ public class FetchRESTData extends AsyncTask<CustomersBox,Void,Void> {
             System.out.println("\nSending 'POST' request to URL : " + url);
             System.out.println("Response Code : " + responseCode);
 
-            //===========
-
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
             }
@@ -70,34 +67,89 @@ public class FetchRESTData extends AsyncTask<CustomersBox,Void,Void> {
 
             StringBuilder sb = new StringBuilder();
             String output;
-            System.out.println("Output from Server .... \n");
+
             while ((output = br.readLine()) != null) {
                 sb.append(output);
-                System.out.println(JSONObject.escape(output));
             }
 
-            System.out.println(sb.toString());
             JSONParser parser = new JSONParser();
-            String tax = new String("in progress");
+            Iterator<JSONObject> iteratorCustomers = null;
 
             try {
                 Object obj = parser.parse(sb.toString());
                 JSONObject jsonObject = (JSONObject) obj;
 
                 JSONArray customer_list = (JSONArray) jsonObject.get("customer_list");
+                iteratorCustomers = customer_list.iterator();
+//                while (iteratorCustomers.hasNext()) {
+//                    JSONObject ar = iteratorCustomers.next();
+//                    if (ar.get("tax_id") != null) tax = ar.get("tax_id").toString();
+//                    else tax = "in progress";
+//                    params[0].setCustomersList(new Customers(ar.get("name").toString(), ar.get("note").toString(), tax, "101".toString()));
+//                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-                System.out.println("\nCompany List:");
-                Iterator<JSONObject> iterator = customer_list.iterator();
-                while (iterator.hasNext()) {
-                    JSONObject ar = iterator.next();
-                    Log.e("FetchRESTData => ", ar.get("name").toString());
-                    System.out.println(ar.get("name") + "\t VAT: " + ar.get("tax_id") + "\t Note: " + ar.get("note"));
-                    if (ar.get("tax_id") != null) tax = ar.get("tax_id").toString();
-                    else tax = "in progress";
-                    params[0].setCustomersList(new Customers(ar.get("name").toString(), tax, ar.get("note").toString()));
+            conn.disconnect();
+
+
+            // ====== Getting extensions
+
+            url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
+            conn = (HttpsURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setDoOutput(true);
+            conn.getOutputStream();
+
+            responseCode = conn.getResponseCode();
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Response Code : " + responseCode);
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
+            }
+
+            br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+            sb = new StringBuilder();
+
+            while ((output = br.readLine()) != null) {
+                sb.append(output);
+            }
+
+            parser = new JSONParser();
+
+            try {
+                Object obj = parser.parse(sb.toString());
+                JSONObject jsonObject = (JSONObject) obj;
+
+                JSONArray extensions_list = (JSONArray) jsonObject.get("extensions_list");
+
+                Boolean sucks = false;
+                String tax = null;
+                Iterator<JSONObject> iteratorExtensions = extensions_list.iterator();
+                while(iteratorCustomers.hasNext()) {
+                    JSONObject arCust = iteratorCustomers.next();
+                    System.out.print("===> "+arCust.get("name")+" ");
+                    sucks = false;
+                    while (iteratorExtensions.hasNext() & !(sucks)) {
+                        JSONObject arExt = iteratorExtensions.next();
+                        if (arExt.get("name").equals(arCust.get("name"))) {
+                            System.out.println(arExt.get("name") + "\t Ext: " + arExt.get("id"));
+                            if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
+                            else tax = "in progress";
+                            params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString(), tax, arExt.get("id").toString()));
+                            sucks = true;
+                        }
+                    }
+                    if (!(sucks)) {
+                        if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
+                        else tax = "in progress";
+                        params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString(), tax, "101"));
+                    }
+                    iteratorExtensions = extensions_list.iterator();
                 }
-
-
             } catch (Exception e) {
                 e.printStackTrace();
             }

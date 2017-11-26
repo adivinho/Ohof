@@ -5,35 +5,69 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="be.ohof.silvo.listwithindex.MainActivity">
-
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="fill_parent"
+        android:layout_height="40sp"
+        android:background="@drawable/fon"
+        android:orientation="horizontal"
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp">
+        <RelativeLayout
+            android:layout_width="130sp"
+            android:layout_height="fill_parent">
+        <ImageView
+            android:id="@+id/header"
+            android:layout_width="fill_parent"
+            android:layout_height="40sp"
+            android:src="@drawable/logo" />
+        </RelativeLayout>
+            <ImageView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_weight="0.35"
+                android:src="@drawable/text" />
+        <RelativeLayout
+            android:layout_width="120sp"
+            android:layout_weight="0.10"
+            android:layout_height="fill_parent">
+        </RelativeLayout>
+    </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
         android:paddingLeft="0dp"
+        android:paddingRight="0dp"
         tools:context=".MainActivity"
         android:baselineAligned="false" >
-
-        <ListView
-            android:id="@+id/list_customers"
-            android:layout_width="0dp"
+        <ExpandableListView
+            android:id="@+id/expandableListView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/antique3"
-            android:paddingRight="0dp">
-        </ListView>
-
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0dp"
+            android:childDivider="@android:color/black"
+            android:groupIndicator="@drawable/indicator"
+            android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft" />
         <LinearLayout
             android:id="@+id/side_index"
-            android:layout_width="50dp"
+            android:layout_width="40sp"
             android:layout_height="fill_parent"
             android:gravity="center_horizontal"
-            android:background="@drawable/antique3"
-
+            android:background="@android:color/darker_gray"
             android:orientation="vertical" >
         </LinearLayout>
-
     </LinearLayout>
 
+    </LinearLayout>
 </android.support.constraint.ConstraintLayout>

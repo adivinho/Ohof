@@ -2,13 +2,11 @@ package be.ohof.silvo.listwithindex;
 
         import java.net.MalformedURLException;
         import java.util.ArrayList;
-        import java.util.Arrays;
         import java.util.LinkedHashMap;
         import java.util.List;
         import java.util.Map;
         import java.util.concurrent.ExecutionException;
 
-        import android.content.res.Resources;
         import android.os.Bundle;
         import android.app.Activity;
         import android.os.Handler;
@@ -18,12 +16,9 @@ package be.ohof.silvo.listwithindex;
         import android.view.View.OnClickListener;
         import android.view.Window;
         import android.view.WindowManager;
-        import android.widget.AdapterView;
-        import android.widget.ArrayAdapter;
+        import android.widget.ExpandableListView;
         import android.widget.LinearLayout;
-        import android.widget.ListView;
         import android.widget.TextView;
-        import android.widget.Toast;
 
         import org.json.JSONException;
         import java.lang.Character;
@@ -31,7 +26,14 @@ package be.ohof.silvo.listwithindex;
 public class MainActivity extends Activity implements OnClickListener {
 
     Map<String, Integer> mapIndex;
-    ListView namesList;
+
+    ExpandableListView expandableListView;
+    CustomExpandableListAdapter expandableListAdapter;
+    List<String> expandableListTitle;
+    LinkedHashMap<String, List<String>> expandableListDetail;
+
+    private int lastExpandedPosition = -1;
+    private Handler handlerListCollapse = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +46,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
         setContentView(R.layout.activity_main);
 
-        final Toast toast = new Toast(getApplicationContext());
-
-        final CustomersBox cb = new CustomersBox();
+        final CustomersBoxHash cb = new CustomersBoxHash();
         cb.clearCustomersList();
-        Log.e("MainActivity",cb.toString());
+
         final String login = getResources().getString(R.string.login);
         final String passwd = getResources().getString(R.string.passwd);
         try {
@@ -59,30 +59,39 @@ public class MainActivity extends Activity implements OnClickListener {
             e.printStackTrace();
         }
 
-        String[] fruits = getResources().getStringArray(R.array.fruits_array);
-        Arrays.asList(fruits);
+        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
+        expandableListDetail = CustomersBoxHash.getData();
+        expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
+        expandableListView.setAdapter(expandableListAdapter);
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
 
-        namesList = (ListView) findViewById(R.id.list_customers);
+            @Override
+            public void onGroupExpand(final int groupPosition) {
+                if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
+                    expandableListView.collapseGroup(lastExpandedPosition);
+                }
+                lastExpandedPosition = groupPosition;
+                handlerListCollapse.removeCallbacksAndMessages(null);
 
-        try {
-            ArrayAdapter<String> itemsAdapter =
-                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, cb.getCustomersNames());
-            namesList.setAdapter(itemsAdapter);
-//            namesList.setAdapter(new ArrayAdapter<String>(this,
-//                    android.R.layout.simple_list_item_1, cb.getCustomersNames()));
-            Log.d("itemsAdapter(count)", String.valueOf(itemsAdapter.getCount()));
-//            ArrayAdapter<String> itemsAdapter2 =
-//                    new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, fruits);
-//            namesList.setAdapter(itemsAdapter2);
-//            itemsAdapter.add("123");
-//            namesList.removeAllViews();
-//            Log.e("itemsAdapter(count)", String.valueOf(itemsAdapter.getCount()));
-            itemsAdapter.notifyDataSetChanged();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+                handlerListCollapse.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        expandableListView.collapseGroup(groupPosition);
+                        lastExpandedPosition = -1;
+                    }
+                }, 10000);
+            }
+        });
+
+        expandableListView.setOnGroupCollapseListener(new ExpandableListView.OnGroupCollapseListener() {
+
+            @Override
+            public void onGroupCollapse(int groupPosition) {
+                handlerListCollapse.removeCallbacksAndMessages(null);
+                lastExpandedPosition = -1;
+            }
+        });
 
         try {
             getIndexList(cb.getCustomersNames());
@@ -92,26 +101,16 @@ public class MainActivity extends Activity implements OnClickListener {
             e.printStackTrace();
         }
 
-        namesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // When clicked, show a toast with the TextView text
-                String vat = cb.getVat((String) ((TextView) view).getText());
-                String ext = cb.getExt((String) ((TextView) view).getText());
-                showAToast(toast, ext+"\nVAT: "+vat);
-            }
-        });
-
         displayIndex();
 
-        // Create the Handler object (on the main thread by default)
-        final Handler handler = new Handler();
+//         Create the Handler object (on the main thread by default)
+        final Handler handlerUpdateDB = new Handler();
         // Define the code block to be executed
         Runnable runnableCode = new Runnable() {
             @Override
             public void run() {
-                // Do something here on the main thread
-                Log.e("Handlers", "Called on main thread");
-                handler.postDelayed(this, 360000); // 360 sec -> 6 min
+                Log.e(getClass().getSimpleName(), "Called on main thread ...");
+                handlerUpdateDB.postDelayed(this, 600000); // 600000 msec -> 10 min
                 cb.clearCustomersList();
                 try {
                     new FetchRESTData(login,passwd).execute(cb).get();
@@ -120,28 +119,54 @@ public class MainActivity extends Activity implements OnClickListener {
                 } catch (ExecutionException e) {
                     e.printStackTrace();
                 }
+
+                expandableListDetail = CustomersBoxHash.getData();
+                expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
+                expandableListAdapter.SetNewData(expandableListTitle, expandableListDetail);
+                expandableListView.setAdapter(expandableListAdapter);
+
+                try {
+                    getIndexList(cb.getCustomersNames());
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         };
-        // Run the above code block on the main thread after 360 seconds
-        handler.post(runnableCode);
+        handlerUpdateDB.post(runnableCode);
     }
 
     private void getIndexList(String[] names) {
-        mapIndex = new LinkedHashMap<String, Integer>();
+        if (mapIndex != null)
+            mapIndex.clear();
+        else
+            mapIndex = new LinkedHashMap<String, Integer>();
+        mapIndex = initABClist();
         for (int i = 0; i < names.length; i++) {
             String name = names[i];
             String index = name.substring(0, 1);
             if (Character.isDigit(index.charAt(0))) {
                 index = "#";
             }
+            if (Character.isLowerCase(index.charAt(0))){
+                index = ""+Character.toUpperCase(index.charAt(0));
+            }
             if (mapIndex.get(index) == null)
                 mapIndex.put(index, i);
         }
     }
 
+    private Map<String, Integer> initABClist() {
+        Map<String, Integer> tmpMapIndex = new LinkedHashMap<String, Integer>();
+        for (char alphabet = 'A'; alphabet <= 'Z'; alphabet++) {
+            tmpMapIndex.put(""+alphabet,null);
+        }
+        return tmpMapIndex;
+    }
+
     private void displayIndex() {
         LinearLayout indexLayout = (LinearLayout) findViewById(R.id.side_index);
-
         TextView textView;
         List<String> indexList = new ArrayList<String>(mapIndex.keySet());
         for (String index : indexList) {
@@ -151,11 +176,17 @@ public class MainActivity extends Activity implements OnClickListener {
             textView.setOnClickListener(this);
             indexLayout.addView(textView);
         }
+        indexLayout.postInvalidate();
     }
 
     public void onClick(View view) {
         TextView selectedIndex = (TextView) view;
-        namesList.setSelection(mapIndex.get(selectedIndex.getText()));
+
+        expandableListView.collapseGroup(lastExpandedPosition);
+        lastExpandedPosition = -1;
+
+        if (mapIndex.get(selectedIndex.getText()) != null)
+            expandableListView.setSelection(mapIndex.get(selectedIndex.getText()));
     }
 
     @Override
@@ -164,16 +195,4 @@ public class MainActivity extends Activity implements OnClickListener {
         return true;
     }
 
-    public void showAToast (Toast t, String st){ //"Toast toast" is declared in the class
-        try{
-            Log.e("showAToast => ","try");
-            t.getView().isShown();     // true if visible
-            t.setText(st);
-            t.setDuration(Toast.LENGTH_SHORT);
-        } catch (Exception e) {         // invisible if exception
-            t = Toast.makeText(getApplicationContext(), st, Toast.LENGTH_LONG);
-            Log.e("showAToast => ","catch");
-        }
-        t.show();
-    }
 }
