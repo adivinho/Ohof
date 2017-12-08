@@ -4,8 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
     android:gravity="center"
-    android:padding="2.5sp"
+    android:padding="2.4sp"
     android:textStyle="bold"
     android:textColor="@android:color/black"
     android:background="@android:color/darker_gray"
-    android:textSize="13.5sp" />
+    android:textSize="12.3sp" />

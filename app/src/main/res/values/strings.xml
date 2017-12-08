@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ListWithIndex</string>
-    <string name="login">XXXXXXX</string>
-    <string name="passwd">XXXXXXXX</string>
+    <string name="login">batreslogin</string>
+    <string name="passwd">jAMeS_BND_125</string>
     <string-array name="fruits_array">
         <item>Apples</item>
         <item>Apricots</item>
