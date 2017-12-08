@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -94,10 +96,24 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.list_group, null);
         }
+
+        int id;
+        ImageView imgTitleImageView = convertView.findViewById(R.id.list_customer_img);
+        String letter = ""+Character.toLowerCase(listTitle.charAt(0));
+
+        if (Character.isDigit(listTitle.charAt(0))) {
+            id = context.getResources().getIdentifier("numero"+letter, "drawable", context.getPackageName());
+        }
+        else {
+            id = context.getResources().getIdentifier(letter, "drawable", context.getPackageName());
+        }
+            imgTitleImageView.setImageResource(id);
+
+//        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(90, 90);
+//        imgTitleImageView.setLayoutParams(params);
         TextView listTitleTextView = (TextView) convertView.findViewById(R.id.list_customers);
         listTitleTextView.setTypeface(null, Typeface.BOLD_ITALIC);
         listTitleTextView.setText(listTitle);
-//        listTitleTextView.setTypeface(typeFace);
         return convertView;
     }
 

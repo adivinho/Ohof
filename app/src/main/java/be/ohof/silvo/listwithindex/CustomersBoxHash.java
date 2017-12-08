@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by silvo on 11/22/17.
  */
@@ -23,13 +24,17 @@ public class CustomersBoxHash {
         expandableListDetail.clear();
     }
 
+
     public static void setCustomersList(Customers cs){
         List<String> customerDetails = new ArrayList<String>();
         customerDetails.add(cs.getDescription());
         customerDetails.add("VAT: "+cs.getVAT());
         customerDetails.add("Ext: "+cs.getExtension());
-//        customerDetails.set(2,"Ext: 912");
         expandableListDetail.put(cs.getName(), customerDetails);
+    }
+
+    public LinkedHashMap<String, List<String>> getCustomersList() {
+        return this.expandableListDetail;
     }
 
     public static void clearCustomersList(){
@@ -37,12 +42,12 @@ public class CustomersBoxHash {
     }
 
     public static String[] getCustomersNames() throws MalformedURLException, JSONException {
-        Log.e("getCustomersNames => ","start");
+        Log.e("CustomersBoxHash","getCustomersNames => start");
         Integer i = 0;
 
         String[] customersNames = new String[expandableListDetail.size()];
         for (Map.Entry<String, List<String>> emp : expandableListDetail.entrySet()) {
-            System.out.println(emp.getKey());
+//            System.out.println(emp.getKey());
             customersNames[i]=emp.getKey();
             i++;
         }
@@ -60,13 +65,16 @@ public class CustomersBoxHash {
             if (temp.getKey().equalsIgnoreCase(emp.getKey()))
             return temp.getValue().get(2);
         }
-
         Log.e("getCustomerExt => ","stop");
         return "101";       // No extension was found - provided Secretary extension
     }
 
-    public String toString() {
-        return String.format("Size: %s", this.expandableListDetail.size());
+//    public String toString() {
+//        return String.format("Size: %s, Keys: %s", this.expandableListDetail.size(), this.expandableListDetail.keySet());
+//    }
+
+    public int getSize() {
+        return this.expandableListDetail.size();
     }
 
     public static LinkedHashMap<String, List<String>> getData() {

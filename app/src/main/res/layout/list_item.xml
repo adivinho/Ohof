@@ -13,21 +13,23 @@
             android:layout_width="0dip"
             android:layout_height="fill_parent"
             android:background="@android:color/darker_gray"
-            android:layout_weight="0.05">
+            android:layout_weight="0.15">
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="0dip"
             android:layout_height="fill_parent"
-            android:layout_weight="0.90">
+            android:layout_weight="0.80">
         <TextView
             android:id="@+id/expandedListItem"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@android:color/black"
-            android:paddingBottom="10dp"
-            android:paddingLeft="?android:attr/expandableListPreferredChildPaddingLeft"
-            android:paddingTop="10dp"
+            android:paddingBottom="10sp"
+            android:paddingLeft="25sp"
+            android:paddingTop="10sp"
+            android:paddingRight="25sp"
+            android:textSize="16.3sp"
             android:textColor="@android:color/white" />
         </RelativeLayout>
         <RelativeLayout

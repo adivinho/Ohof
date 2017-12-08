@@ -1,5 +1,7 @@
 package be.ohof.silvo.listwithindex;
 
+        import java.lang.reflect.InvocationTargetException;
+        import java.lang.reflect.Method;
         import java.net.MalformedURLException;
         import java.util.ArrayList;
         import java.util.LinkedHashMap;
@@ -7,6 +9,9 @@ package be.ohof.silvo.listwithindex;
         import java.util.Map;
         import java.util.concurrent.ExecutionException;
 
+        import android.annotation.SuppressLint;
+        import android.app.ActionBar;
+        import android.content.SharedPreferences;
         import android.os.Bundle;
         import android.app.Activity;
         import android.os.Handler;
@@ -31,6 +36,7 @@ public class MainActivity extends Activity implements OnClickListener {
     CustomExpandableListAdapter expandableListAdapter;
     List<String> expandableListTitle;
     LinkedHashMap<String, List<String>> expandableListDetail;
+    CustomersBoxHash cb = new CustomersBoxHash();
 
     private int lastExpandedPosition = -1;
     private Handler handlerListCollapse = new Handler();
@@ -39,20 +45,24 @@ public class MainActivity extends Activity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // remove title and set full screen
+        // remove title and set full screen till API 21 (Android 5.0.0)
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
+        final SharedPreferences.Editor editor = pref.edit();
+
         setContentView(R.layout.activity_main);
 
-        final CustomersBoxHash cb = new CustomersBoxHash();
         cb.clearCustomersList();
 
         final String login = getResources().getString(R.string.login);
         final String passwd = getResources().getString(R.string.passwd);
+
         try {
-            new FetchRESTData(login, passwd).execute(cb).get();
+            new FetchRESTData(login, passwd, editor, pref).execute(cb).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -105,15 +115,15 @@ public class MainActivity extends Activity implements OnClickListener {
 
 //         Create the Handler object (on the main thread by default)
         final Handler handlerUpdateDB = new Handler();
-        // Define the code block to be executed
         Runnable runnableCode = new Runnable() {
             @Override
             public void run() {
                 Log.e(getClass().getSimpleName(), "Called on main thread ...");
-                handlerUpdateDB.postDelayed(this, 600000); // 600000 msec -> 10 min
+                handlerUpdateDB.postDelayed(this, 7200000); // 600000 msec -> 10 min
+
                 cb.clearCustomersList();
                 try {
-                    new FetchRESTData(login,passwd).execute(cb).get();
+                    new FetchRESTData(login,passwd,editor, pref).execute(cb).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
@@ -191,8 +201,46 @@ public class MainActivity extends Activity implements OnClickListener {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        System.out.println("Status bar has been expanded");
+        try
+        {
+            if(!hasFocus)            {
+                System.out.println("Going to collapse it");
+                @SuppressLint("WrongConstant") final Object service  = getSystemService("statusbar");
+                Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+                final Method collapse = statusbarManager.getMethod("collapsePanels");
+                Method expand = statusbarManager.getMethod("expandNotificationsPanel");
+
+                expand.invoke(service);
+                collapse.setAccessible(true);
+                for(int j = 0; j<25; j++){
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                collapse.invoke(service);
+                            } catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                            } catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }, j*150);
+                }
+            }
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        Thread.currentThread().getState();
+    }
 }
