@@ -117,7 +117,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
             Iterator<JSONObject> iteratorExtensions = extensions_list.iterator();
             while(iteratorCustomers.hasNext()) {
                 JSONObject arCust = iteratorCustomers.next();
-//                System.out.println("===> "+arCust.get("name")+" "+arCust.get("blocked"));
+//                System.out.println("===> "+arCust.get("name")+" "+arCust.get("blocked")+" "+arCust.get("i_customer_type"));
                 sucks = false;
                 while (iteratorExtensions.hasNext() & !(sucks)) {
                     JSONObject arExt = iteratorExtensions.next();
@@ -125,16 +125,17 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
 //                            System.out.println(arExt.get("name") + "\t Ext: " + arExt.get("id"));
                         if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                         else tax = "in progress";
-                        if (arCust.get("blocked").equals("N"))
-                            params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString(), tax, arExt.get("id").toString()));
+
+                        if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").equals("1"))
+                            params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, arExt.get("id").toString()));
                         sucks = true;
                     }
                 }
                 if (!(sucks)) {
                     if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                     else tax = "in progress";
-                    if (arCust.get("blocked").equals("N"))
-                        params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString(), tax, "Call to Office Hof desk"));
+                    if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").equals("1"))
+                        params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, "Call to Office Hof desk"));
                 }
                 iteratorExtensions = extensions_list.iterator();
             }

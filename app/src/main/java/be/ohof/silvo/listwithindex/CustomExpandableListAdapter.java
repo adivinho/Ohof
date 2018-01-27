@@ -24,8 +24,6 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> expandableListTitle;
     private LinkedHashMap<String, List<String>> expandableListDetail;
-//    public Typeface typeFace=Typeface.createFromAsset(context.getAssets(),"fonts/roboto.ttf");
-
 
     public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
                                        LinkedHashMap<String, List<String>> expandableListDetail) {
