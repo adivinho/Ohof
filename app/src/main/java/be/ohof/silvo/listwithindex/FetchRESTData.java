@@ -126,7 +126,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                         if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                         else tax = "in progress";
 
-                        if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").equals("1"))
+                        if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1"))
                             params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, arExt.get("id").toString()));
                         sucks = true;
                     }
@@ -134,7 +134,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                 if (!(sucks)) {
                     if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                     else tax = "in progress";
-                    if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").equals("1"))
+                    if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1"))
                         params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, "Call to Office Hof desk"));
                 }
                 iteratorExtensions = extensions_list.iterator();
