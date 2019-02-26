@@ -30,6 +30,7 @@ public class CustomersBoxHash {
         customerDetails.add(cs.getDescription());
         customerDetails.add("VAT: "+cs.getVAT());
         customerDetails.add("Ext: "+cs.getExtension());
+        customerDetails.add("Rack: "+cs.getRack());
         expandableListDetail.put(cs.getName(), customerDetails);
     }
 
