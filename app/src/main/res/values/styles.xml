@@ -9,6 +9,7 @@
         <item name="android:fitsSystemWindows">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowBackground">@drawable/loading</item>
     </style>
 
 </resources>

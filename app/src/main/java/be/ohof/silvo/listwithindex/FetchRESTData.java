@@ -102,10 +102,9 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
         }
 
         // ===== getting extensions list
-        sb = new StringBuilder(pushRestRequestExtensions());
+        sb = new StringBuilder(pushRestRequestExtensions(session_id));
 
         if (sb.length() > 0) {
-            System.out.println("Reply size is "+sb.length());
             editor.putString("extensions", sb.toString());
             editor.commit();
             writeToFile("ohofExtensions.txt", sb);
@@ -134,64 +133,62 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
             while(iteratorCustomers.hasNext()) {
                 JSONObject arCust = iteratorCustomers.next();
                 Boolean sucks = false;
-
-                // Getting subscriptions of a customer
-                sb = new StringBuilder(pushRestRequestSubscriptions(session_id, Integer.valueOf(arCust.get("i_customer").toString())));
-
-                if (sb.length() > 0) {
-                    System.out.println("Reply size is " + sb.length());
-                    editor.putString("subscriptions", sb.toString());
-                    editor.commit();
-                    writeToFile("ohof_"+arCust.get("i_customer")+".txt", sb);
-                    Log.e("=>", "Reply size is " + sb.toString());
-
-                } else {
-                    Log.e("====>", "Looks like Internet problems. Kept up previous extensions data");
-                    try {
-                        sb = readFromFile("ohof_"+arCust.get("i_customer")+".txt");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
                 String rack = new String();
-                Pattern rackPatternNotepad = Pattern.compile("###.*###$");
-                obj = parser.parse(sb.toString());
-                jsonObject = (JSONObject) obj;
-                JSONArray subscriptions_list = (JSONArray) jsonObject.get("subscriptions");
-                Iterator<JSONObject> iteratorSubscriptions = subscriptions_list.iterator();
-                while (iteratorSubscriptions.hasNext()) {
-                    JSONObject arSub = iteratorSubscriptions.next();
-                    Matcher matcher = rackPattern.matcher(arSub.get("name").toString());
-                    if (matcher.find() & (arSub.get("is_finished").toString().equals("N"))) {
-                        String[] parts = arSub.get("name").toString().substring(matcher.start(), matcher.end()).split(" ");
-                        if (rack.length() == 0) rack = parts[1];
-                        else rack = rack + "-" + parts[1];
-                    }
-                    if (arSub.get("is_finished").toString().equals("N") & arSub.get("name").equals("16 Document rack rent")) {
-                        rack = "notepad";
-                        String customerInfo = pushRestRequestCustomerInfo(session_id, Integer.valueOf(arCust.get("i_customer").toString()));
+                if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1")) {
+
+                    // Getting subscriptions of a customer
+                    sb = new StringBuilder(pushRestRequestSubscriptions(session_id, Integer.valueOf(arCust.get("i_customer").toString())));
+
+                    if (sb.length() > 0) {
+                        editor.putString("subscriptions", sb.toString());
+                        editor.commit();
+                        writeToFile("ohof_" + arCust.get("i_customer") + ".txt", sb);
+                    } else {
+                        Log.e("====>", "Looks like Internet problems. Kept up previous extensions data");
                         try {
-                            Object objC = parser.parse(customerInfo);
-                            JSONObject jsonObjectC = (JSONObject) objC;
-                            JSONObject customerNotepad = (JSONObject) jsonObjectC.get("customer_info");
-                            Matcher matcherNotepad = rackPatternNotepad.matcher(customerNotepad.get("notepad").toString());
-                            if (matcherNotepad.find()) {
-                                rack = customerNotepad.get("notepad").toString().substring(matcherNotepad.start(), matcherNotepad.end()).replaceAll("#","");;
-                            }
-                            System.out.println("*** " + arCust.get("name") + "\t Notepad: " + rack);
-                        } catch (ParseException e) {
+                            sb = readFromFile("ohof_" + arCust.get("i_customer") + ".txt");
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
-                }
 
-                if (rack.length() == 0) rack = "None";
+                    Pattern rackPatternNotepad = Pattern.compile("###.*###$");
+                    obj = parser.parse(sb.toString());
+                    jsonObject = (JSONObject) obj;
+                    JSONArray subscriptions_list = (JSONArray) jsonObject.get("subscriptions");
+                    Iterator<JSONObject> iteratorSubscriptions = subscriptions_list.iterator();
+                    while (iteratorSubscriptions.hasNext()) {
+                        JSONObject arSub = iteratorSubscriptions.next();
+                        Matcher matcher = rackPattern.matcher(arSub.get("name").toString());
+                        if (matcher.find() & (arSub.get("is_finished").toString().equals("N"))) {
+                            String[] parts = arSub.get("name").toString().substring(matcher.start(), matcher.end()).split(" ");
+                            if (rack.length() == 0) rack = parts[1];
+                            else rack = rack + "-" + parts[1];
+                        }
+                        if (arSub.get("is_finished").toString().equals("N") & arSub.get("name").equals("16 Document rack rent")) {
+                            rack = "Notepad";
+                            String customerInfo = pushRestRequestCustomerInfo(session_id, Integer.valueOf(arCust.get("i_customer").toString()));
+                            try {
+                                Object objC = parser.parse(customerInfo);
+                                JSONObject jsonObjectC = (JSONObject) objC;
+                                JSONObject customerNotepad = (JSONObject) jsonObjectC.get("customer_info");
+                                Matcher matcherNotepad = rackPatternNotepad.matcher(customerNotepad.get("notepad").toString());
+                                if (matcherNotepad.find()) {
+                                    rack = customerNotepad.get("notepad").toString().substring(matcherNotepad.start(), matcherNotepad.end()).replaceAll("#", "");
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    if (rack.length() == 0) rack = "None";
+                }
 
                 while (iteratorExtensions.hasNext() & !(sucks)) {
                     JSONObject arExt = iteratorExtensions.next();
                     if (arExt.get("name").equals(arCust.get("name"))) {
-                        System.out.println("*** "+arExt.get("name") + "\t Ext: " + arExt.get("id"));
+     //                   System.out.println("*** "+arExt.get("name") + "\t Ext: " + arExt.get("id")+ "\t Rack: " + rack);
                         if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                         else tax = "in progress";
 
@@ -229,10 +226,6 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.getOutputStream();
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
 
             if (conn.getResponseCode() != 200) {
 //                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
@@ -277,9 +270,9 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
             conn.setDoOutput(true);
             conn.getOutputStream();
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
+//            int responseCode = conn.getResponseCode();
+//            System.out.println("\nSending 'POST' request to URL : " + url);
+//            System.out.println("Response Code : " + responseCode);
 
             if (conn.getResponseCode() != 200) {
 //                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
@@ -311,19 +304,20 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
         return sb;
     }
 
-    private StringBuilder pushRestRequestExtensions() {
+    private StringBuilder pushRestRequestExtensions(String session_id) {
         StringBuilder sb = new StringBuilder();
         try {
             Log.e("FetchRESTData", "connecting to pbs (Extensions) ...");
-            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
+//            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
+            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.getOutputStream();
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
+//            int responseCode = conn.getResponseCode();
+//            System.out.println("\nSending 'POST' request to URL : " + url);
+//            System.out.println("Response Code : " + responseCode);
 
             if (conn.getResponseCode() != 200) {
 //                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
@@ -357,17 +351,16 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
     private StringBuilder pushRestRequestSubscriptions(String session_id, Integer i_customer) {
         StringBuilder sb = new StringBuilder();
         try {
-            Log.e("FetchRESTData", "connecting to pbs (Subscriptions) ...");
-      //      URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_subscriptions/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D/%7B%22i_customer%22:%22"+i_customer+"%22%7D");
+//            Log.e("FetchRESTData", "connecting to pbs (Subscriptions) i_customer: "+ i_customer);
             URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_subscriptions/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%22"+i_customer+"%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.getOutputStream();
 
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
+//            int responseCode = conn.getResponseCode();
+//            System.out.println("\nSending 'POST' request to URL : " + url);
+//            System.out.println("Response Code : " + responseCode);
 
             if (conn.getResponseCode() != 200) {
 //                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());
@@ -400,16 +393,12 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
     private String pushRestRequestCustomerInfo(String session_id, Integer i_customer) {
         StringBuilder sb = new StringBuilder();
         try {
-            Log.e("FetchRESTData", "connecting to pbs (Subscriptions) ...");
+//            Log.e("FetchRESTData", "connecting to pbs (CustomerInfo)");
             URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_customer_info/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%22"+i_customer+"%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
             conn.getOutputStream();
-
-            int responseCode = conn.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Response Code : " + responseCode);
 
             if (conn.getResponseCode() != 200) {
 //                throw new RuntimeException("\n\nFailed : HTTP error code : " + conn.getResponseCode());

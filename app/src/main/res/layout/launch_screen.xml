@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+    tools:context="be.ohof.silvo.listwithindex.MainActivity">
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:ignore="MissingConstraints" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="fill_parent"
+            android:layout_height="40sp"
+            android:background="@drawable/fon"
+            android:orientation="horizontal"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp">
+            <RelativeLayout
+                android:layout_width="130sp"
+                android:layout_height="fill_parent">
+                <ImageView
+                    android:id="@+id/header"
+                    android:layout_width="fill_parent"
+                    android:layout_height="40sp"
+                    android:src="@drawable/logo" />
+            </RelativeLayout>
+            <ImageView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="40sp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_weight="0.35"
+                android:src="@drawable/text" />
+            <RelativeLayout
+                android:layout_width="120sp"
+                android:layout_weight="0.10"
+                android:layout_height="fill_parent">
+            </RelativeLayout>
+        </LinearLayout>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingLeft="0dp"
+            android:paddingRight="0dp"
+            tools:context=".MainActivity"
+            android:baselineAligned="false" >
+
+            <ListView
+                android:id="@+id/simpleListView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:childDivider="@android:color/black"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="0dp"
+                android:fadeScrollbars="false"
+                android:indicatorLeft="290sp"
+                android:indicatorRight="320sp"
+                android:transitionGroup="false"
+                android:groupIndicator="@drawable/indicator"
+                tools:transitionGroup="false" />
+
+
+            <LinearLayout
+                android:id="@+id/side_index"
+                android:layout_width="30sp"
+                android:layout_height="fill_parent"
+                android:gravity="center_horizontal"
+                android:background="@android:color/darker_gray"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

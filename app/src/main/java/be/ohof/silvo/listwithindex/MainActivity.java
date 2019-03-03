@@ -23,6 +23,7 @@ package be.ohof.silvo.listwithindex;
         import android.view.WindowManager;
         import android.widget.ExpandableListView;
         import android.widget.LinearLayout;
+        import android.widget.ListView;
         import android.widget.TextView;
 
         import org.json.JSONException;
@@ -30,6 +31,7 @@ package be.ohof.silvo.listwithindex;
 
 public class MainActivity extends Activity implements OnClickListener {
 
+    ListView SimpleListView;
     Map<String, Integer> mapIndex;
 
     ExpandableListView expandableListView;
@@ -54,7 +56,7 @@ public class MainActivity extends Activity implements OnClickListener {
         final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         final SharedPreferences.Editor editor = pref.edit();
 
-        setContentView(R.layout.activity_main);
+   //     setContentView(R.layout.launch_screen);
 
         cb.clearCustomersList();
 
@@ -69,13 +71,14 @@ public class MainActivity extends Activity implements OnClickListener {
             e.printStackTrace();
         }
 
+        setContentView(R.layout.activity_main); // ----------
+
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
         expandableListDetail = CustomersBoxHash.getData();
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
         expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
-        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
-
+        expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() { // ---- Set auto-closing action
             @Override
             public void onGroupExpand(final int groupPosition) {
                 if (lastExpandedPosition != -1 && groupPosition != lastExpandedPosition) {
@@ -242,5 +245,8 @@ public class MainActivity extends Activity implements OnClickListener {
             ex.printStackTrace();
         }
         Thread.currentThread().getState();
+    }
+
+    private class StableArrayAdapter {
     }
 }
