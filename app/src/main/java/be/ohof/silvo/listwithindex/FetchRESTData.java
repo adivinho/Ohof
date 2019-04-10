@@ -134,7 +134,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                 JSONObject arCust = iteratorCustomers.next();
                 Boolean sucks = false;
                 String rack = new String();
-                if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1")) {
+                if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1") & arCust.get("i_customer_class").toString().equals("3047")) {
 
                     // Getting subscriptions of a customer
                     sb = new StringBuilder(pushRestRequestSubscriptions(session_id, Integer.valueOf(arCust.get("i_customer").toString())));
@@ -166,7 +166,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                             else rack = rack + "-" + parts[1];
                         }
                         if (arSub.get("is_finished").toString().equals("N") & arSub.get("name").equals("16 Document rack rent")) {
-                            rack = "Notepad";
+                            rack = "None";
                             String customerInfo = pushRestRequestCustomerInfo(session_id, Integer.valueOf(arCust.get("i_customer").toString()));
                             try {
                                 Object objC = parser.parse(customerInfo);
@@ -181,9 +181,9 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                             }
                         }
                     }
-
-                    if (rack.length() == 0) rack = "None";
                 }
+
+                if (rack.length() == 0) rack = "None";
 
                 while (iteratorExtensions.hasNext() & !(sucks)) {
                     JSONObject arExt = iteratorExtensions.next();
@@ -192,7 +192,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                         if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                         else tax = "in progress";
 
-                        if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1")){
+                        if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1") & arCust.get("i_customer_class").toString().equals("3047")){
     //                        System.out.println("Added! "+arCust.get("blocked").equals("N")+" "+arCust.get("i_customer_type").toString().equals("1"));
                             params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, "* "+arExt.get("id").toString(), rack));
                         }
@@ -202,7 +202,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                 if (!(sucks)) {
                     if (arCust.get("tax_id") != null) tax = arCust.get("tax_id").toString();
                     else tax = "in progress";
-                    if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1"))
+                    if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1") & arCust.get("i_customer_class").toString().equals("3047"))
                         params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, "Call to Office Hof desk",rack));
                 }
                 iteratorExtensions = extensions_list.iterator();
@@ -351,7 +351,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
     private StringBuilder pushRestRequestSubscriptions(String session_id, Integer i_customer) {
         StringBuilder sb = new StringBuilder();
         try {
-//            Log.e("FetchRESTData", "connecting to pbs (Subscriptions) i_customer: "+ i_customer);
+            Log.e("FetchRESTData", "connecting to pbs (Subscriptions) i_customer: "+ i_customer);
             URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_subscriptions/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%22"+i_customer+"%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");

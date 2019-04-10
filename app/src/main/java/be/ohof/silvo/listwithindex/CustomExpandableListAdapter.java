@@ -23,18 +23,21 @@ import java.util.TreeMap;
 public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private List<String> expandableListTitle;
+    private List<String> expandableListRacks;
     private LinkedHashMap<String, List<String>> expandableListDetail;
 
-    public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
+    public CustomExpandableListAdapter(Context context, List<String> expandableListTitle, List<String> expandableListRacks,
                                        LinkedHashMap<String, List<String>> expandableListDetail) {
         this.context = context;
         this.expandableListTitle = expandableListTitle;
+        this.expandableListRacks = expandableListRacks;
         this.expandableListDetail = expandableListDetail;
     }
 
-    public void SetNewData(List<String> expandableListTitle,
+    public void SetNewData(List<String> expandableListTitle, List<String> expandableListRacks,
                                        LinkedHashMap<String, List<String>> expandableListDetail) {
         this.expandableListTitle = expandableListTitle;
+        this.expandableListRacks = expandableListRacks;
         this.expandableListDetail = expandableListDetail;
     }
 
@@ -75,6 +78,11 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
         return this.expandableListTitle.get(listPosition);
     }
 
+//    @Override
+    public Object getGroupRack(int listPosition) {
+        return this.expandableListRacks.get(listPosition);
+    }
+
     @Override
     public int getGroupCount() {
         return this.expandableListTitle.size();
@@ -89,6 +97,7 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
     public View getGroupView(int listPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
         String listTitle = (String) getGroup(listPosition);
+        String listRack = (String) getGroupRack(listPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -109,9 +118,14 @@ public class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
 //        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(90, 90);
 //        imgTitleImageView.setLayoutParams(params);
+
         TextView listTitleTextView = (TextView) convertView.findViewById(R.id.list_customers);
         listTitleTextView.setTypeface(null, Typeface.BOLD_ITALIC);
         listTitleTextView.setText(listTitle);
+
+        TextView listRacksTextView = (TextView) convertView.findViewById(R.id.list_racks);
+        listRacksTextView.setTypeface(null, Typeface.BOLD_ITALIC);
+        listRacksTextView.setText(listRack);
         return convertView;
     }
 

@@ -30,7 +30,7 @@ public class CustomersBoxHash {
         customerDetails.add(cs.getDescription());
         customerDetails.add("VAT: "+cs.getVAT());
         customerDetails.add("Ext: "+cs.getExtension());
-        customerDetails.add("Rack: "+cs.getRack());
+        customerDetails.add(cs.getRack());
         expandableListDetail.put(cs.getName(), customerDetails);
     }
 
@@ -80,5 +80,15 @@ public class CustomersBoxHash {
 
     public static LinkedHashMap<String, List<String>> getData() {
         return expandableListDetail;
+    }
+
+    public static ArrayList<String>  getRacks() {
+        ArrayList <String> Racks = new ArrayList<>();
+
+        for (Map.Entry<String, List<String>> emp : expandableListDetail.entrySet()) {
+//            System.out.println(emp.getKey());
+            Racks.add(emp.getValue().get(3));
+        }
+        return Racks;
     }
 }

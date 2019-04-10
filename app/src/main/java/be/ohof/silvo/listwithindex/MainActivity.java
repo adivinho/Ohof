@@ -31,12 +31,12 @@ package be.ohof.silvo.listwithindex;
 
 public class MainActivity extends Activity implements OnClickListener {
 
-    ListView SimpleListView;
+    ListView simpleListView;
     Map<String, Integer> mapIndex;
 
     ExpandableListView expandableListView;
     CustomExpandableListAdapter expandableListAdapter;
-    List<String> expandableListTitle;
+    List<String> expandableListTitle, expandableListRack;
     LinkedHashMap<String, List<String>> expandableListDetail;
     CustomersBoxHash cb = new CustomersBoxHash();
 
@@ -56,28 +56,38 @@ public class MainActivity extends Activity implements OnClickListener {
         final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         final SharedPreferences.Editor editor = pref.edit();
 
-   //     setContentView(R.layout.launch_screen);
-
         cb.clearCustomersList();
 
         final String login = getResources().getString(R.string.login);
         final String passwd = getResources().getString(R.string.passwd);
 
-        try {
-            new FetchRESTData(login, passwd, editor, pref).execute(cb).get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            new FetchRESTData(login, passwd, editor, pref).execute(cb).get();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        } catch (ExecutionException e) {
+//            e.printStackTrace();
+//        }
 
+
+    //    setContentView(R.layout.launch_screen);
+
+    //    simpleListView = findViewById(R.id.simpleListView);
         setContentView(R.layout.activity_main); // ----------
 
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
         expandableListDetail = CustomersBoxHash.getData();
         expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
+        expandableListRack = CustomersBoxHash.getRacks();
+        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListRack, expandableListDetail);
         expandableListView.setAdapter(expandableListAdapter);
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() { // ---- Disable expanding
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v,
+                                        int groupPosition, long id) {
+                return true; // This way the expander cannot be collapsed
+            }
+        });
         expandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() { // ---- Set auto-closing action
             @Override
             public void onGroupExpand(final int groupPosition) {
@@ -135,7 +145,8 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 expandableListDetail = CustomersBoxHash.getData();
                 expandableListTitle = new ArrayList<String>(expandableListDetail.keySet());
-                expandableListAdapter.SetNewData(expandableListTitle, expandableListDetail);
+                expandableListRack = CustomersBoxHash.getRacks();
+                expandableListAdapter.SetNewData(expandableListTitle, expandableListRack, expandableListDetail);
                 expandableListView.setAdapter(expandableListAdapter);
 
                 try {

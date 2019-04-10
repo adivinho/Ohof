@@ -33,9 +33,21 @@
 
             <TextView
                 android:id="@+id/list_customers"
-                android:layout_width="230sp"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
+                android:paddingLeft="10sp"
+                android:paddingTop="10sp"
+                android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
+                android:paddingBottom="10sp"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/list_racks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
                 android:paddingBottom="10sp"
                 android:paddingLeft="10sp"
                 android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
@@ -43,17 +55,6 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp" />
 
-            <TextView
-                android:id="@+id/list_racks"
-                android:layout_width="110sp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:paddingBottom="10sp"
-                android:paddingLeft="10sp"
-                android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
-                android:paddingTop="10sp"
-                android:textColor="@android:color/white"
-                android:textSize="20sp" />
         </LinearLayout>
     </LinearLayout>
 

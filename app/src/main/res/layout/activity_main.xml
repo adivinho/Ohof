@@ -68,7 +68,7 @@
             android:indicatorLeft="290sp"
             android:indicatorRight="320sp"
             android:transitionGroup="false"
-            android:groupIndicator="@drawable/indicator"
+            android:groupIndicator="@null"
             tools:transitionGroup="false" />
         <LinearLayout
             android:id="@+id/side_index"
