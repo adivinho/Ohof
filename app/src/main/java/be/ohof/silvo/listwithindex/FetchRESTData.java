@@ -40,12 +40,16 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
 
     String login;
     String passwd;
+    String api_address;
+    String api_port;
     SharedPreferences.Editor editor;
     SharedPreferences pref;
 
     public Pattern rackPattern = Pattern.compile("\\d{2}_Rack [A-Z0-9]{1,3}$");
 
-    public FetchRESTData(String login, String passwd, SharedPreferences.Editor editor, SharedPreferences pref){
+    public FetchRESTData(String api_address, String api_port, String login, String passwd, SharedPreferences.Editor editor, SharedPreferences pref){
+        this.api_address = api_address;
+        this.api_port = api_port;
         this.login = login;
         this.passwd = passwd;
         this.editor = editor;
@@ -220,7 +224,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
         try {
             Log.e("FetchRESTData", "connecting to pbs (Authentication) ...");
 
-            URL url = new URL("https://pbs.allrelay.com:8442/rest/Session/login/%7B%7D/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22,%22domain%22:%22pbs.allrelay.com%22%7D");
+            URL url = new URL("https://"+api_address+":"+api_port+"/rest/Session/login/%7B%7D/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22,%22domain%22:%22pbs.allrelay.com%22%7D");
 
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -264,7 +268,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
 
             // ====== Getting customers list
 
-            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_customer_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D");
+            URL url = new URL("https://"+api_address+":"+api_port+"/rest/Customer/get_customer_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);
@@ -308,8 +312,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
         StringBuilder sb = new StringBuilder();
         try {
             Log.e("FetchRESTData", "connecting to pbs (Extensions) ...");
-//            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22login%22:%22"+login+"%22,%22password%22:%22"+passwd+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
-            URL url = new URL("https://pbs.allrelay.com:8442/rest/Customer/get_extensions_list/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
+            URL url = new URL("https://"+api_address+":"+api_port+"/rest/Customer/get_extensions_list/%7B%22session_id%22:%22"+session_id+"%22%7D/%7B%22i_customer%22:%2289906%22%7D");
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setDoOutput(true);

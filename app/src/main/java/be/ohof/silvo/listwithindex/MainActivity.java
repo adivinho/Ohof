@@ -11,6 +11,7 @@ package be.ohof.silvo.listwithindex;
 
         import android.annotation.SuppressLint;
         import android.app.ActionBar;
+        import android.content.Intent;
         import android.content.SharedPreferences;
         import android.os.Bundle;
         import android.app.Activity;
@@ -58,8 +59,14 @@ public class MainActivity extends Activity implements OnClickListener {
 
         cb.clearCustomersList();
 
-        final String login = getResources().getString(R.string.login);
-        final String passwd = getResources().getString(R.string.passwd);
+        Intent initIntent = getIntent(); // gets the previously created intent
+        final String api_address = initIntent.getStringExtra("api_address");
+        final String api_port = initIntent.getStringExtra("api_port");
+        final String login = initIntent.getStringExtra("login");
+        final String passwd= initIntent.getStringExtra("passwd");
+
+//        final String login = getResources().getString(R.string.login);
+//        final String passwd = getResources().getString(R.string.passwd);
 
 //        try {
 //            new FetchRESTData(login, passwd, editor, pref).execute(cb).get();
@@ -136,7 +143,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 cb.clearCustomersList();
                 try {
-                    new FetchRESTData(login,passwd,editor, pref).execute(cb).get();
+                    new FetchRESTData(api_address, api_port, login,passwd,editor, pref).execute(cb).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {
