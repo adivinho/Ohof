@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ListWithIndex.iml" filepath="$PROJECT_DIR$/ListWithIndex.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ohof.iml" filepath="$PROJECT_DIR$/Ohof.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

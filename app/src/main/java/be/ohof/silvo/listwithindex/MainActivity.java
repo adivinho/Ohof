@@ -1,32 +1,31 @@
 package be.ohof.silvo.listwithindex;
 
-        import java.lang.reflect.InvocationTargetException;
-        import java.lang.reflect.Method;
-        import java.net.MalformedURLException;
-        import java.util.ArrayList;
-        import java.util.LinkedHashMap;
-        import java.util.List;
-        import java.util.Map;
-        import java.util.concurrent.ExecutionException;
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
-        import android.annotation.SuppressLint;
-        import android.app.ActionBar;
-        import android.content.SharedPreferences;
-        import android.os.Bundle;
-        import android.app.Activity;
-        import android.os.Handler;
-        import android.util.Log;
-        import android.view.Menu;
-        import android.view.View;
-        import android.view.View.OnClickListener;
-        import android.view.Window;
-        import android.view.WindowManager;
-        import android.widget.ExpandableListView;
-        import android.widget.LinearLayout;
-        import android.widget.TextView;
+import org.json.JSONException;
 
-        import org.json.JSONException;
-        import java.lang.Character;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -54,15 +53,24 @@ public class MainActivity extends Activity implements OnClickListener {
         final SharedPreferences pref = getApplicationContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
         final SharedPreferences.Editor editor = pref.edit();
 
+     //   setContentView(R.layout.activity_init_setup);
         setContentView(R.layout.activity_main);
 
         cb.clearCustomersList();
 
-        final String login = getResources().getString(R.string.login);
-        final String passwd = getResources().getString(R.string.passwd);
+        Intent initIntent = getIntent(); // gets the previously created intent
+        final String api_address = initIntent.getStringExtra("api_address");
+        final String api_port = initIntent.getStringExtra("api_port");
+        final String login = initIntent.getStringExtra("login");
+        final String passwd= initIntent.getStringExtra("passwd");
+
+   //     final String api_address = getResources().getString(R.string.api_address);
+   //     final String api_port = getResources().getString(R.string.api_port);
+   //     final String login = getResources().getString(R.string.login);
+   //     final String passwd = getResources().getString(R.string.passwd);
 
         try {
-            new FetchRESTData(login, passwd, editor, pref).execute(cb).get();
+            new FetchRESTData(api_address, api_port, login, passwd, editor, pref).execute(cb).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
@@ -123,7 +131,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
                 cb.clearCustomersList();
                 try {
-                    new FetchRESTData(login,passwd,editor, pref).execute(cb).get();
+                    new FetchRESTData(api_address,api_port,login,passwd,editor, pref).execute(cb).get();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } catch (ExecutionException e) {

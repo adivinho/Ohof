@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Ohof</string>
+    <string name="api_address">my.server.com</string>
     <string name="login">login</string>
     <string name="passwd">P@ssW0RD</string>
 </resources>
