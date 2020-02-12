@@ -131,7 +131,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                         else tax = "in progress";
 
                         if (arCust.get("blocked").equals("N") & arCust.get("i_customer_type").toString().equals("1"))
-                            params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, arExt.get("id").toString()));
+                            params[0].setCustomersList(new Customers(arCust.get("name").toString(), arCust.get("note").toString().replaceAll("&", "and"), tax, '\u2731'+" "+arExt.get("id").toString()+ "  " +'\u2706'));
                         sucks = true;
                     }
                 }
