@@ -156,7 +156,7 @@ public class FetchRESTData extends AsyncTask<CustomersBoxHash,Void,Void> {
                         }
                     }
 
-                    Pattern rackPatternNotepad = Pattern.compile("###.*###$");
+                    Pattern rackPatternNotepad = Pattern.compile("###.*###");
                     obj = parser.parse(sb.toString());
                     jsonObject = (JSONObject) obj;
                     JSONArray subscriptions_list = (JSONArray) jsonObject.get("subscriptions");

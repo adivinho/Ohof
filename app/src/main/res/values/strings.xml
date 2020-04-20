@@ -4,4 +4,5 @@
     <string name="api_address">my.server.com</string>
     <string name="login">login</string>
     <string name="passwd">p@ssword</string>
+    <integer name="rereadInterval">1800000</integer> // 600000 msec -> 10 min
 </resources>

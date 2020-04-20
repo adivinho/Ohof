@@ -63,7 +63,8 @@ public class MainActivity extends Activity implements OnClickListener {
         final String api_address = initIntent.getStringExtra("api_address");
         final String api_port = initIntent.getStringExtra("api_port");
         final String login = initIntent.getStringExtra("login");
-        final String passwd= initIntent.getStringExtra("passwd");
+        final String passwd = initIntent.getStringExtra("passwd");
+        final Integer rereadInterval = initIntent.getIntExtra("rereadInterval",600000);
 
 //        final String login = getResources().getString(R.string.login);
 //        final String passwd = getResources().getString(R.string.passwd);
@@ -139,7 +140,7 @@ public class MainActivity extends Activity implements OnClickListener {
             @Override
             public void run() {
                 Log.e(getClass().getSimpleName(), "Called on main thread ...");
-                handlerUpdateDB.postDelayed(this, 7200000); // 600000 msec -> 10 min
+                handlerUpdateDB.postDelayed(this, rereadInterval); // 600000 msec -> 10 min
 
                 cb.clearCustomersList();
                 try {
